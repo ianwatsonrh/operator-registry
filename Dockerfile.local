@@ -1,5 +1,4 @@
 FROM golang:1.13-alpine AS builder
-RUN find . -name "pull-secret.txt" 
 RUN apk update && apk add sqlite build-base git mercurial bash
 WORKDIR /build
 COPY . .
@@ -9,11 +8,8 @@ RUN GRPC_HEALTH_PROBE_VERSION=v0.3.2 && \
     chmod +x /bin/grpc_health_probe
 
 FROM registry.redhat.io/openshift4/ose-cli:v4.6 AS oc
-RUN ls tmp
-COPY --from=builder tmp/pull-secret.txt tmp/pull-secret.txt
 COPY --from=builder /build/bin/opm /bin/opm
-RUN ls tmp
-RUN oc image extract registry.redhat.io/redhat/redhat-operator-index:v4.6 --path /database/index.db:. -a tmp/pull-secret.txt --confirm
+RUN oc image extract registry.redhat.io/redhat/redhat-operator-index:v4.6 --path /database/index.db:. -a /run/secrets/openshift.io/build/pull-secret/pull-secret.txt --confirm
 RUN /bin/opm index prune -f registry.redhat.io/redhat/redhat-operator-index:v4.6 -p cluster-logging,elastic
 search-operator --prune-local
 
