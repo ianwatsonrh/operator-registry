@@ -1,5 +1,5 @@
 FROM golang:1.13-alpine AS builder
-RUN ls
+RUN mount
 #RUN find / -name "pull-secret.txt" 2>/dev/null 
 
 FROM registry.redhat.io/openshift4/ose-cli:v4.6 AS oc
