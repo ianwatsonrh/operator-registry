@@ -42,6 +42,8 @@ func newIndexPruneCmd() *cobra.Command {
 	indexCmd.Flags().StringP("tag", "t", "", "custom tag for container image being built")
 	indexCmd.Flags().Bool("permissive", false, "allow registry load errors")
 
+        indexCmd.Flags().Bool("prune-local", false, "allow to prune a local index.db file instead of downloading from a image")
+
 	if err := indexCmd.Flags().MarkHidden("debug"); err != nil {
 		logrus.Panic(err.Error())
 	}
@@ -95,6 +97,11 @@ func runIndexPruneCmdFunc(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+        pruneLocal, err := cmd.Flags().GetBool("prune-local")
+        if err != nil {
+                return err
+        }
+
 	skipTLS, err := cmd.Flags().GetBool("skip-tls")
 	if err != nil {
 		return err
@@ -115,6 +122,7 @@ func runIndexPruneCmdFunc(cmd *cobra.Command, args []string) error {
 		Tag:               tag,
 		Permissive:        permissive,
 		SkipTLS:           skipTLS,
+                PruneLocal:        pruneLocal,
 	}
 
 	err = indexPruner.PruneFromIndex(request)

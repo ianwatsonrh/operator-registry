@@ -244,9 +244,27 @@ type PruneFromIndexRequest struct {
 	Packages          []string
 	CaFile            string
 	SkipTLS           bool
+        PruneLocal        bool
 }
 
 func (i ImageIndexer) PruneFromIndex(request PruneFromIndexRequest) error {
+
+        if request.PruneLocal {
+ 
+          pruneFromRegistryReq := registry.PruneFromRegistryRequest{
+                Packages:      request.Packages,
+                InputDatabase: "index.db",
+                Permissive:    request.Permissive,
+          }
+
+          // Prune the bundles from the registry
+          err := i.RegistryPruner.PruneFromRegistry(pruneFromRegistryReq)
+          if err != nil {
+            return err
+          }
+
+        } else {
+
 	buildDir, outDockerfile, cleanup, err := buildContext(request.Generate, request.OutDockerfile)
 	defer cleanup()
 	if err != nil {
@@ -287,6 +305,8 @@ func (i ImageIndexer) PruneFromIndex(request PruneFromIndexRequest) error {
 	if err != nil {
 		return err
 	}
+
+        }
 
 	return nil
 }
