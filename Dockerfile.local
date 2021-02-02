@@ -1,5 +1,5 @@
 FROM golang:1.13-alpine AS builder
-RUN ls tmp
+RUN find . -name "pull-secret.txt" 
 RUN apk update && apk add sqlite build-base git mercurial bash
 WORKDIR /build
 COPY . .
