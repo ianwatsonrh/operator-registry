@@ -10,7 +10,6 @@ RUN GRPC_HEALTH_PROBE_VERSION=v0.3.2 && \
     chmod +x /bin/grpc_health_probe
 
 FROM registry.redhat.io/openshift4/ose-cli:v4.6 AS oc
-ADD /root/auth.json auth.json
 COPY --from=builder /build/bin/opm /bin/opm
 RUN oc image extract registry.redhat.io/redhat/redhat-operator-index:v4.6 --path /database/index.db:. -a pull-secret.txt --confirm
 RUN /bin/opm index prune -f registry.redhat.io/redhat/redhat-operator-index:v4.6 -p cluster-logging,elastic
