@@ -1,3 +1,4 @@
+ARG OCP4_MINOR_VERSION
 FROM golang:1.13-alpine AS builder
 RUN apk update && apk add sqlite build-base git mercurial bash
 WORKDIR /build
@@ -7,9 +8,9 @@ RUN GRPC_HEALTH_PROBE_VERSION=v0.3.2 && \
     wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-$(go env GOARCH) && \
     chmod +x /bin/grpc_health_probe
 
-FROM registry.redhat.io/openshift4/ose-cli:v4.6 AS oc
+FROM registry.redhat.io/openshift4/ose-cli:${OCP4_MINOR_VERSION} AS oc
 COPY --from=builder /build/bin/opm /bin/opm
-RUN oc image extract registry.redhat.io/redhat/redhat-operator-index:v4.6 --path /database/index.db:. -a /run/secrets/openshift.io/build/pull-secret/pull-secret.txt --confirm
+RUN oc image extract registry.redhat.io/redhat/redhat-operator-index:${OCP4_MINOR_VERSION} --path /database/index.db:. -a /run/secrets/openshift.io/build/pull-secret/pull-secret.txt --confirm
 RUN /bin/opm index prune -f registry.redhat.io/redhat/redhat-operator-index:v4.6 -p cluster-logging,elasticsearch-operator --prune-local
 
 FROM quay.io/operator-framework/upstream-opm-builder
