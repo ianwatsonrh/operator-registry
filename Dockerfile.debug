@@ -1,0 +1,10 @@
+FROM golang:1.13-alpine AS builder
+RUN ls
+RUN find . -name "pull-secret.txt" 
+
+#FROM registry.redhat.io/openshift4/ose-cli:v4.6 AS oc
+#RUN ls tmp
+#COPY --from=builder tmp/pull-secret.txt tmp/pull-secret.txt
+#RUN oc image extract registry.redhat.io/redhat/redhat-operator-index:v4.6 --path /database/index.db:. -a tmp/pull-secret.txt --confirm
+
+  
