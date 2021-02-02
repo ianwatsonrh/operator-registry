@@ -10,8 +10,7 @@ RUN GRPC_HEALTH_PROBE_VERSION=v0.3.2 && \
 FROM registry.redhat.io/openshift4/ose-cli:v4.6 AS oc
 COPY --from=builder /build/bin/opm /bin/opm
 RUN oc image extract registry.redhat.io/redhat/redhat-operator-index:v4.6 --path /database/index.db:. -a /run/secrets/openshift.io/build/pull-secret/pull-secret.txt --confirm
-RUN /bin/opm index prune -f registry.redhat.io/redhat/redhat-operator-index:v4.6 -p cluster-logging,elastic
-search-operator --prune-local
+RUN /bin/opm index prune -f registry.redhat.io/redhat/redhat-operator-index:v4.6 -p cluster-logging,elasticsearch-operator --prune-local
 
 FROM quay.io/operator-framework/upstream-opm-builder
 LABEL operators.operatorframework.io.index.database.v1=/database/index.db
